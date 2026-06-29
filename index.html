@@ -18,6 +18,11 @@
 <!-- <meta name="twitter:card" content="summary_large_image"> -->
 <!-- <meta name="twitter:image" content="https://YOUR-DOMAIN/og-image.png"> -->
 
+<!-- Vercel Web Analytics: works once you enable Analytics in the Vercel dashboard + deploy.
+     Gives visitors/pageviews, and powers the custom game_started / game_completed events below.
+     404s harmlessly anywhere that isn't Vercel. Swap for Plausible/GA if you prefer. -->
+<script defer src="/_vercel/insights/script.js"></script>
+
 <style>
   :root {
     --ground: #14110F;
@@ -74,7 +79,7 @@
   .conf { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 150px; justify-content: flex-end; }
   .conf .lbl { color: var(--faded); }
   .conf .track { flex: 1; max-width: 110px; height: 7px; background: #2c241c; border-radius: 99px; overflow: hidden; }
-  .conf .fill { height: 100%; width: 100%; background: var(--ok); border-radius: 99px; box-shadow: 0 0 6px rgba(111,191,123,0.5); }
+  .conf .fill { display: block; height: 100%; width: 100%; background: var(--ok); border-radius: 99px; box-shadow: 0 0 6px rgba(111,191,123,0.5); }
   .conf .pct { width: 38px; text-align: right; font-variant-numeric: tabular-nums; color: var(--ok); }
 
   /* ---------- card ---------- */
@@ -418,7 +423,20 @@
     }
   };
 
-  function go(id) { var s = scenes[id]; render(s.html, s.state); }
+  var started = false;
+  function trackEvent(name) {
+    try {
+      if (window.va) { window.va("event", { name: name }); }        // Vercel Analytics
+      else if (window.plausible) { window.plausible(name); }          // Plausible
+      else if (window.gtag) { window.gtag("event", name); }           // Google Analytics
+    } catch (e) {}
+  }
+
+  function go(id) {
+    if (id === "intro" && !started) { started = true; trackEvent("game_started"); }
+    if (id === "ending") { trackEvent("game_completed"); }
+    var s = scenes[id]; render(s.html, s.state);
+  }
   function toast(msg) { var t = document.getElementById("toast"); if (t) t.textContent = msg; }
 
   function bind() {
