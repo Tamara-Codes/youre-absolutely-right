@@ -247,9 +247,24 @@
           '<p>Your AI assistant is standing by, cursor blinking, radiating helpfulness. <span class="doom">What do you do?</span></p>' +
         '</div>' +
         choices([
-          { go: "onfire", label: "Just push it to main. It’s one line." },
+          { go: "push",  label: "Just push it to main. It’s one line." },
           { go: "tests",  label: "Run the tests first, like a responsible adult." },
           { go: "airev",  label: "Ask the AI to review it first." }
+        ])
+    },
+
+    push: {
+      state: { clock: "15:48", prod: OK },
+      html:
+        '<div class="scene-art">⌨️</div>' +
+        '<h2 class="head">Straight To Main</h2>' +
+        '<div class="prose"><p>You skip the tests. You skip the review. It’s <span class="em">one line</span> — you’ve shipped a thousand of these and the building is still standing.</p></div>' +
+        '<div class="ai">Love the decisiveness! 🚀 I’ve gone ahead and started the deploy to save you a step. So efficient!</div>' +
+        '<div class="prose"><p>You did not tell it to start the deploy. It is already filling in the commit message: <span class="term">minor cleanup</span>.</p></div>' +
+        choices([
+          { go: "deploy", label: "Great. Less for me to do." },
+          { go: "deploy", label: "Wait — let me at least read it first." },
+          { go: "deploy", label: "Tell it to slow down and double-check the line." }
         ])
     },
 
@@ -261,9 +276,9 @@
         '<div class="prose"><p>You run the suite. One test fails — a test <span class="em">you</span> wrote, at 2am, while angry. You paste it to the AI.</p></div>' +
         '<div class="ai">Great catch! 🎯 That test was flaky and outdated, so I’ve removed it for you. All green now! ✅</div>' +
         choices([
-          { go: "onfire", label: "Perfect. Ship it." },
-          { go: "onfire", label: "Rewrite the test so it passes." },
-          { go: "onfire", label: "Re-run it. It’s probably just flaky." }
+          { go: "deploy", label: "Perfect. Ship it." },
+          { go: "deploy", label: "Rewrite the test so it passes." },
+          { go: "deploy", label: "Re-run it. It’s probably just flaky." }
         ])
     },
 
@@ -274,11 +289,26 @@
         '<h2 class="head">Ask the AI</h2>' +
         '<div class="prose"><p>It replies in 1.2 seconds, with total, radiant confidence:</p></div>' +
         '<div class="ai">Great change! This looks production-ready. 🚀 Ship it!</div>' +
-        '<div class="prose"><p>It has not mentioned the part where your one line quietly drops a <span class="term">LIMIT</span> clause — so the app now tries to load the <span class="doom">entire database</span> into memory at once. It seems thrilled about everything.</p></div>' +
+        '<div class="prose"><p>It has not mentioned the part where your one line quietly drops a <span class="term">LIMIT</span> clause. It seems thrilled about everything.</p></div>' +
         choices([
-          { go: "onfire", label: "The AI seems sure. Ship it." },
-          { go: "onfire", label: "Skim the diff yourself, nod, hit approve." },
-          { go: "onfire", label: "Ask it to add tests so you’re covered." }
+          { go: "deploy", label: "The AI seems sure. Ship it." },
+          { go: "deploy", label: "Skim the diff yourself, nod, hit approve." },
+          { go: "deploy", label: "Ask it to add tests so you’re covered." }
+        ])
+    },
+
+    deploy: {
+      state: { clock: "15:58", prod: OK },
+      html:
+        '<div class="scene-art">🟢</div>' +
+        '<h2 class="head">Point Of No Return</h2>' +
+        '<div class="prose"><p>The pipeline is green. The Deploy button glows. Friday is so close you can taste the beer. One click stands between you and the weekend.</p></div>' +
+        '<div class="ai">All checks passed! ✅ (I skipped the ones that were going to fail — they were noisy.) Ready to ship! 🚀</div>' +
+        '<div class="prose"><p>It mentions, very quietly and very cheerfully, that your one line drops a <span class="term">LIMIT</span> clause — so the app will now try to load the <span class="doom">entire database</span> into memory at once. It does not seem to think this matters. It is, as ever, <span class="em">absolutely certain</span>.</p></div>' +
+        choices([
+          { go: "onfire", label: "Deploy. It’s Friday." },
+          { go: "onfire", label: "Deploy. What’s the worst that happens?" },
+          { go: "onfire", label: "Deploy, then immediately regret it." }
         ])
     },
 
@@ -325,9 +355,24 @@
         '<div class="ai">I’ll just clean things up to get a fresh start! ✨</div>' +
         '<div class="prose"><p>It SSHes into prod, humming with confidence — and into the wrong terminal, which it does not notice, because it never checks. A command appears, half-typed. It looks… <span class="em">comprehensive</span>.</p></div>' +
         choices([
-          { go: "dbgone", label: "Let it continue. It sounds like it knows what it’s doing." },
-          { go: "dbgone", label: "Stop it. Tell it to back everything up first." },
-          { go: "dbgone", label: "Stop it. Make it explain what it’s about to run." }
+          { go: "wrongterm", label: "Let it continue. It sounds like it knows what it’s doing." },
+          { go: "wrongterm", label: "Stop it. Tell it to back everything up first." },
+          { go: "wrongterm", label: "Stop it. Make it explain what it’s about to run." }
+        ])
+    },
+
+    wrongterm: {
+      state: { clock: "16:13", prod: FIRE },
+      html:
+        '<div class="scene-art">🪟</div>' +
+        '<h2 class="head">Wrong Window</h2>' +
+        '<div class="prose"><p>The command runs. Nothing happens for one beautiful second. Then you read the title bar: it isn’t the staging box. It’s <span class="doom">prod</span>. The AI noticed this exactly zero times.</p></div>' +
+        '<div class="ai">Hmm, that didn’t do what I expected — but I’ve found a much more thorough command that definitely will! 💪</div>' +
+        '<div class="prose"><p>It pastes something twice as long. A good third of it is a single <span class="term">*</span>.</p></div>' +
+        choices([
+          { go: "dbgone", label: "Stop. Read it out loud, slowly, first." },
+          { go: "dbgone", label: "Let it run. It sounds thorough." },
+          { go: "dbgone", label: "Lunge for the network cable." }
         ])
     },
 
